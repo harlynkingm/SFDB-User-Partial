@@ -15,7 +15,7 @@
     <body>
         <div class="user-profile">
             <a class="new-btn top-right" href="#">EDIT</a>
-            <div class="progress" id="circle-bar" data-percent="80" data-width="20" data-size="200" data-large-percent="40">
+            <div class="progress" id="circle-bar" data-width="20" data-size="200" data-points="12">
                 <canvas id="circle-canvas"></canvas>
                 <span class="under-text"><br>To Next Level</span>
             </div>
@@ -24,9 +24,9 @@
                 <h3 id="username">
                     username: <i>username</i><br>
                     email: <i>person@gmail.com</i><br>
-                    <b>Level 4</b>/12<br>
-                    <b>67</b> Curation Points<br>
-                    <b>33</b> Left Until Curator Status
+                    <b>Level <span id="userlevel"></span></b>/<span id="levelcount"></span><br>
+                    <b id="totalpoints"></b> Curation Points<br>
+                    <b id="pointsleft"></b> Left Until Curator Status
                 </h3>
                 <hr style="margin:4px">
                 <a class="new-btn" href="#">See Contributions</a>

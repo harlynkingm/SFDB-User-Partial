@@ -1,21 +1,43 @@
 
 var LEVELS = [0, 1, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+var outerSize = 25;
 var canvas = document.getElementById('circle-canvas');
-
-if (canvas){
 
 var circle = document.getElementById('circle-bar');
     
 var settings = {
-    largepercent: circle.getAttribute('data-large-percent'),
-    smallpercent: circle.getAttribute('data-percent'),
+    points: circle.getAttribute('data-points'),
     lineWidth: circle.getAttribute('data-width'),
     size: circle.getAttribute('data-size')
 }
 
+var detectLevel = function(points){
+    level = 0
+    for (var i = 1; i < LEVELS.length; i++){
+        if (points < LEVELS[i]) return level + 1;
+        else level++;
+    }
+}
+
+var userLevel = detectLevel(settings.points);
+if (userLevel < LEVELS.length){
+    var nextLevelPoints = LEVELS[userLevel];
+    var pointsBetweenLevels = LEVELS[userLevel] - LEVELS[userLevel - 1];
+    var progressToNextLevel = pointsBetweenLevels - (nextLevelPoints - settings.points);
+    var percentComplete = progressToNextLevel / pointsBetweenLevels;
+}
+else{
+    var percentComplete = 100/100;
+}
+
+document.getElementById('userlevel').textContent = userLevel;
+document.getElementById('levelcount').textContent = LEVELS.length - 1;
+document.getElementById('totalpoints').textContent = settings.points;
+document.getElementById('pointsleft').textContent = Math.max(LEVELS[LEVELS.length - 1] - settings.points, 0);
+
 var span = document.createElement('div');
 span.className = "progress-text";
-span.textContent = 1 + '%';
+span.textContent = 0 + '%';
 
 var ctx = canvas.getContext('2d');
 canvas.width = canvas.height = settings.size;
@@ -42,64 +64,25 @@ localPercent = 1;
 t = 0
 timer = setInterval(function(){
     if (localPercent < 100){
-        drawCircle(settings.size, '#FDAE61', settings.lineWidth, (localPercent / 100) * (settings.largepercent/100));
-        drawCircle(settings.size - 25, '#fff', settings.lineWidth, 100 / 100);
-        drawCircle(settings.size - 25, '#196B94', settings.lineWidth, (localPercent / 100) * (settings.smallpercent / 100));
+        if (settings.points > 0){
+            drawCircle(settings.size, '#FDAE61', settings.lineWidth, (localPercent / 100) * (Math.min(settings.points, 100)/LEVELS[LEVELS.length - 1]));
+        }
+        drawCircle(settings.size - outerSize, '#fff', settings.lineWidth, 100 / 100);
+        if (percentComplete > 0){
+            if (settings.points < LEVELS[LEVELS.length - 1]){
+                drawCircle(settings.size - outerSize, '#196B94', settings.lineWidth, (localPercent / 100) * percentComplete);
+            }
+            else{
+                drawCircle(settings.size - outerSize + 1, '#FDAE61', settings.lineWidth, (localPercent / 100));
+            }
+            span.textContent = Math.round((localPercent / 100) * percentComplete * 100) + '%';
+        }
         v = -.01 * t*(t/10) + 1;
         localPercent += v;
         t += .01;
-        span.textContent = Math.round((settings.smallpercent / 100) * localPercent * settings.smallpercent/100) + '%';
     }
     else{
         clearInterval(timer);
-        span.textContent = settings.smallpercent + '%';
+        span.textContent = percentComplete * 100 + '%';
     }
 }, 10);
-}
-else{
-
-var canvas = document.getElementById('square-canvas');
-var square = document.getElementById('square-bar');
-square.style.marginTop = 0;
-    
-var settings = {
-    largepercent: square.getAttribute('data-large-percent'),
-    smallpercent: square.getAttribute('data-percent'),
-    lineWidth: square.getAttribute('data-width'),
-    levelPoints: square.getAttribute('data-levelpoints')
-}
-
-var ctx = canvas.getContext('2d');
-canvas.width = 200;
-canvas.height = document.getElementById('user-profile').clientHeight;
-    
-ctx.translate(canvas.width/2, canvas.height);
-
-var drawRect = function(offsetX, height, color, lineWidth, percent){
-    percent = Math.min(Math.max(0, percent || 1), 1);
-    ctx.beginPath();
-    ctx.rect((lineWidth * -1) - offsetX, height * percent * -1, lineWidth, height * percent);
-    ctx.fillStyle = color;
-    ctx.fill();
-}
-    
-localPercent = 1;
-t = 0
-prog = document.getElementById("progress");
-timer = setInterval(function(){
-    if (localPercent < 100){
-        drawRect(50, canvas.height * .9, '#FDAE61', settings.lineWidth, (localPercent / 100) * (settings.largepercent/100));
-        drawRect(45, canvas.height * .9, '#fff', settings.lineWidth, 100/100);
-        drawRect(45, canvas.height * .9, '#196B94', settings.lineWidth, (localPercent / 100) * (settings.smallpercent / 100));
-        v = -.01 * t*(t/10) + 1;
-        localPercent += v;
-        t += .01;
-        prog.innerHTML = Math.round((localPercent/100) * settings.levelPoints * (settings.smallpercent / 100));
-    }
-    else{
-        clearInterval(timer);
-        prog.innerHTML = Math.round((localPercent/100) * settings.levelPoints * (settings.smallpercent / 100));
-    }
-}, 9);
-
-}
